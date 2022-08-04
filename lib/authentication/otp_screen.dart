@@ -1,5 +1,7 @@
-import 'package:demo_test/homepage_screen.dart';
+import 'package:demo_test/bottomNavigationBar/app.dart';
+import 'package:demo_test/screens/homepage_screen.dart';
 import 'package:demo_test/utils/app_color.dart';
+import 'package:demo_test/bottomNavigationBar/bottom_navigation_bars.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
@@ -9,7 +11,7 @@ class OtpScreen extends StatefulWidget {
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
-}
+} 
 
 class _OtpScreenState extends State<OtpScreen> {
   final otpController = TextEditingController();
@@ -109,7 +111,7 @@ class _OtpScreenState extends State<OtpScreen> {
       onTap: () {
         if (widget.otp == otpController.text) {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const HomePageScreen()));
+              MaterialPageRoute(builder: (context) =>   App()));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               backgroundColor: Appcolors.primaryColor,

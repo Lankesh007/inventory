@@ -20,7 +20,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const[
-              Text("Home Page")
+              Text("Home Page",)
             ],
           ),
           

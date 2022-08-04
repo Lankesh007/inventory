@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_test/authentication/login_screen.dart';
-import 'package:demo_test/homepage_screen.dart';
+import 'package:demo_test/screens/homepage_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/app_color.dart';
