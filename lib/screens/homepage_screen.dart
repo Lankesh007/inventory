@@ -1,3 +1,4 @@
+import 'package:demo_test/screens/inventory_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomePageScreen extends StatefulWidget {
@@ -19,11 +20,24 @@ class _HomePageScreenState extends State<HomePageScreen> {
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const[
-              Text("Home Page",)
+            children:  [
+             const Text(
+                "Home Page",
+              ),
+              SizedBox(height: 50,),
+              InkWell(
+                onTap: (){
+               Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const InventoryScreen()));
+                },
+                child: const Text(
+                  "Navigate",
+                ),
+              ),
             ],
           ),
-          
         ],
       ),
     );

@@ -15,8 +15,8 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   double height = 0;
   double width = 0;
+  bool loading = false;
   final _formKey = GlobalKey<FormState>();
-
   final emailController = TextEditingController();
   final phoneNumberController = TextEditingController();
   final firmNameController = TextEditingController();
@@ -218,8 +218,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       onTap: () {
         if (_formKey.currentState!.validate()) {
           registerUser(name: "users");
-        }
-        else{
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               backgroundColor: Appcolors.primaryColor,
               content: Text(
@@ -238,9 +237,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             15,
           ),
         ),
-        child: const Text(
-          "Register",
-          style: TextStyle(
+        child: Text(
+          loading == true ? "Please Wait..." : "Register",
+          style: const TextStyle(
               color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
@@ -250,6 +249,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   //-------------------Store to cloud firestore --------------//
 
   Future registerUser({required String name}) async {
+    setState(() {
+      loading = true;
+    });
     if (emailController.text.isEmpty &&
         phoneNumberController.text.isEmpty &&
         firmNameController.text.isEmpty &&
@@ -274,6 +276,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // ignore: use_build_context_synchronously
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => const HomePageScreen()));
+
+      setState(() {
+        loading = false;
+      });
     }
   }
 }

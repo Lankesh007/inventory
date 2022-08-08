@@ -1,5 +1,7 @@
 import 'package:demo_test/bottomNavigationBar/bottom_navigation_bars.dart';
 import 'package:demo_test/screens/homepage_screen.dart';
+import 'package:demo_test/screens/inventory_screen.dart';
+import 'package:demo_test/screens/master_screen.dart';
 import 'package:demo_test/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +23,15 @@ class AppState extends State<App> {
       tabName: "Home",
       icon: Icons.home,
       page:const HomePageScreen(),
+    ),
+       TabItem(
+      tabName: "Master",
+      icon: Icons.manage_history_rounded,
+      page: const MasterScreen(),
+    ),   TabItem(
+      tabName: "Inventory",
+      icon: Icons.inventory,
+      page: const InventoryScreen(),
     ),
     TabItem(
       tabName: "Settings",

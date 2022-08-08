@@ -15,13 +15,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   double height = 0;
   double width = 0;
+  bool loading = false;
   int otp = 0;
 
   _genrateOtp() {}
 
   final phoneNumberController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
 
   @override
   void initState() {
@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
       height: height * 0.1,
       width: width * 0.87,
       child: Form(
-        key:_formKey ,
+        key: _formKey,
         child: Card(
           elevation: 15,
           child: Column(
@@ -144,13 +144,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: height * 0.07,
                 width: width,
                 child: TextFormField(
-                    validator: (text) {
-                      if (text == null || text.isEmpty) {
-                        return 'Phone Number is empty';
-                      }
-                      return null;
-                    },
-                  
+                  validator: (text) {
+                    if (text == null || text.isEmpty) {
+                      return 'Phone Number is empty';
+                    }
+                    return null;
+                  },
                   keyboardType: TextInputType.number,
                   controller: phoneNumberController,
                   decoration: const InputDecoration(
@@ -171,9 +170,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return InkWell(
       onTap: () {
         if (_formKey.currentState!.validate()) {
-       loginUser(otpName: "userOtp");
-        }
-        else{
+          loginUser(otpName: "userOtp");
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               backgroundColor: Appcolors.primaryColor,
               content: Text(
@@ -192,9 +190,9 @@ class _LoginScreenState extends State<LoginScreen> {
             15,
           ),
         ),
-        child: const Text(
-          "Login",
-          style: TextStyle(
+        child: Text(
+          loading == true ? "Please Wait..." : "Login",
+          style: const TextStyle(
               color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
@@ -204,6 +202,9 @@ class _LoginScreenState extends State<LoginScreen> {
   //-------------------Store to cloud firestore --------------//
 
   Future loginUser({required String otpName}) async {
+    setState(() {
+      loading = true;
+    });
     var value = Random();
     var otp = value.nextInt(9000) + 1000;
     print("----->$otp");
@@ -229,6 +230,10 @@ class _LoginScreenState extends State<LoginScreen> {
               builder: (context) => OtpScreen(
                     otp: otp.toString(),
                   )));
+
+      setState(() {
+        loading = false;
+      });
     }
   }
 }
