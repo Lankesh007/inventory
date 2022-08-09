@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:demo_test/screens/masterTab/unit_master_details_screen.dart';
 import 'package:demo_test/utils/app_color.dart';
 import 'package:flutter/material.dart';
 
@@ -188,6 +189,8 @@ class _UnitMasterScreenState extends State<UnitMasterScreen> {
             style: TextStyle(fontWeight: FontWeight.bold),
           )));
     });
+
+   Navigator.pop(context);
     setState(() {
       loading = false;
     });

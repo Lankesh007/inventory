@@ -1,5 +1,6 @@
-import 'package:demo_test/screens/item_master_screen.dart';
-import 'package:demo_test/screens/unit_master_screen.dart';
+import 'package:demo_test/screens/masterTab/item_master_details_screen.dart';
+import 'package:demo_test/screens/masterTab/supplies_master_screen.dart';
+import 'package:demo_test/screens/masterTab/unit_master_details_screen.dart';
 import 'package:demo_test/utils/app_color.dart';
 import 'package:flutter/material.dart';
 
@@ -45,8 +46,11 @@ class _MasterScreenState extends State<MasterScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const UnitMasterScreen()));
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const UnitMasterDetailsScreen()));
                 },
                 child: SizedBox(
                   height: height * 0.15,
@@ -92,8 +96,12 @@ class _MasterScreenState extends State<MasterScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const ItemMasterScreen()));
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const ItemMasterDetailsScreen()));
                 },
                 child: SizedBox(
                   height: height * 0.15,
@@ -113,20 +121,25 @@ class _MasterScreenState extends State<MasterScreen> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: height * 0.15,
-                width: width * 0.45,
-                child: Card(
-                  elevation: 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text(
-                        "Supplies Master",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      )
-                    ],
+              InkWell(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const SuppliesMasterScreen()));
+                },
+                child: SizedBox(
+                  height: height * 0.15,
+                  width: width * 0.45,
+                  child: Card(
+                    elevation: 5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Supplies Master",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),

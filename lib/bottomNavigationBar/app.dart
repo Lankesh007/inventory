@@ -1,10 +1,10 @@
 import 'package:demo_test/bottomNavigationBar/bottom_navigation_bars.dart';
 import 'package:demo_test/screens/homepage_screen.dart';
 import 'package:demo_test/screens/inventory_screen.dart';
-import 'package:demo_test/screens/master_screen.dart';
 import 'package:demo_test/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
+import '../screens/masterTab/master_screen.dart';
 import 'tab_item.dart';
 
 class App extends StatefulWidget {
