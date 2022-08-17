@@ -1,16 +1,18 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:demo_test/utils/app_color.dart';
 import 'package:flutter/material.dart';
+import '../../utils/app_color.dart';
 
-class UnitMasterScreen extends StatefulWidget {
-  const UnitMasterScreen({Key? key}) : super(key: key);
+class UpdateUnitMasterScreen extends StatefulWidget {
+  final String unitName;
+  const UpdateUnitMasterScreen({required this.unitName, Key? key})
+      : super(key: key);
 
   @override
-  State<UnitMasterScreen> createState() => _UnitMasterScreenState();
+  State<UpdateUnitMasterScreen> createState() => _UpdateUnitMasterScreenState();
 }
 
-class _UnitMasterScreenState extends State<UnitMasterScreen> {
+class _UpdateUnitMasterScreenState extends State<UpdateUnitMasterScreen> {
   bool isTap = true;
   bool loading = false;
   double height = 0;
@@ -24,6 +26,12 @@ class _UnitMasterScreenState extends State<UnitMasterScreen> {
   }
 
   @override
+  void initState() {
+    unitNameController.text = widget.unitName;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
@@ -31,7 +39,7 @@ class _UnitMasterScreenState extends State<UnitMasterScreen> {
       appBar: AppBar(
         backgroundColor: Appcolors.primaryColor,
         title: const Text(
-          "Unit Master",
+          "Update Unit Master",
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -122,9 +130,9 @@ class _UnitMasterScreenState extends State<UnitMasterScreen> {
               return null;
             },
             controller: unitNameController,
-            decoration: const InputDecoration(
-                hintText: "Enter your Unit",
-                hintStyle: TextStyle(fontSize: 14),
+            decoration: InputDecoration(
+                hintText: widget.unitName,
+                hintStyle: const TextStyle(fontSize: 14),
                 border: InputBorder.none),
           ),
         ),
@@ -136,7 +144,7 @@ class _UnitMasterScreenState extends State<UnitMasterScreen> {
     return InkWell(
       onTap: () {
         if (_formKey.currentState!.validate()) {
-          submitUnit();
+          updateUnit();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               backgroundColor: Appcolors.primaryColor,
@@ -157,7 +165,7 @@ class _UnitMasterScreenState extends State<UnitMasterScreen> {
           ),
         ),
         child: Text(
-          loading == true ? "Please Wait..." : "Submit",
+          loading == true ? "Please Wait..." : "Update Unit",
           style: const TextStyle(
               color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
@@ -167,29 +175,28 @@ class _UnitMasterScreenState extends State<UnitMasterScreen> {
 
 // -------------------- Firebase Cloud Store Function-------------------------//
 
-  Future submitUnit() async {
+  Future updateUnit() async {
     setState(() {
       loading = true;
     });
-    final userDoc = FirebaseFirestore.instance.collection('unitMaster').doc();
-    final json = {
+
+    FirebaseFirestore.instance.collection('unitMaster').doc().update({
       'unit': unitNameController.text.toString(),
       'action': isTap,
-    };
+    });
 
-    await userDoc.set(json);
     // ignore: use_build_context_synchronously
     setState(() {
       clearText();
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           backgroundColor: Appcolors.primaryColor,
           content: Text(
-            "Unit Submitted Successfully !!",
+            "Unit Updated Successfully !!",
             style: TextStyle(fontWeight: FontWeight.bold),
           )));
     });
 
-   Navigator.pop(context);
+    Navigator.pop(context);
     setState(() {
       loading = false;
     });

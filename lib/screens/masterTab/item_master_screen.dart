@@ -1,13 +1,11 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:demo_test/screens/masterTab/item_master_details_screen.dart';
-import 'package:demo_test/screens/masterTab/supplies_master_screen.dart';
-
 import 'package:demo_test/utils/app_color.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ItemMasterScreen extends StatefulWidget {
   const ItemMasterScreen({Key? key}) : super(key: key);
@@ -23,6 +21,7 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
   String dropdownvalue = 'Select';
   String unitMasterValue = "Select";
   final _formKey = GlobalKey<FormState>();
+  final picker = ImagePicker();
 
   PlatformFile? pickedFile;
 
@@ -34,17 +33,33 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
     });
   }
 
-  Future uploadFile() async {
-    final path = 'files/${pickedFile!.path}';
-    final file = File(pickedFile!.path!);
+  File? _image;
+  String image = "";
+  String base64Image = "";
 
-    final ref = FirebaseStorage.instance.ref().child(path);
-    final uploadTask = ref.putFile(file);
+  // Future uploadFile() async {
+  //   final path = 'files/${pickedFile!.path}';
+  //   final file = File(pickedFile!.path!);
 
-    final snapShot = await uploadTask.whenComplete(() => () {});
-    final urlDownload = await snapShot.ref.getDownloadURL();
-    log('Image download link---->$urlDownload');
-  }
+  //   final ref = FirebaseStorage.instance.ref().child(path);
+  //   final uploadTask = ref.putFile(file);
+
+  //   final snapShot = await uploadTask.whenComplete(() => () {});
+  //   final urlDownload = await snapShot.ref.getDownloadURL();
+  //   log('Image download link---->$urlDownload');
+
+  //   // setState(() {
+  //   //   if (pickedFile != null) {
+  //   //     _image = File(pickedFile!.path!);
+  //   //     var imageBytes = _image!.readAsBytesSync();
+  //   //     base64Image = base64Encode(imageBytes);
+  //   //     log("base 64 image=====>$base64Image");
+  //   //     // postprofile();
+  //   //   } else {
+  //   //     print('No image selected.');
+  //   //   }
+  //   // });
+  // }
 
   final itemNameController = TextEditingController();
 
@@ -79,6 +94,70 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
         userCompanyList.addAll(val.docs);
       });
     });
+  }
+
+  Future getImagefromGallery() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        var imageBytes = _image!.readAsBytesSync();
+        base64Image = base64Encode(imageBytes);
+        log(base64Image);
+        // postprofile();
+      } else {
+        log('No image selected.');
+      }
+    });
+  }
+
+  Future getImageFromCamera() async {
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        var imageBytes = _image!.readAsBytesSync();
+        base64Image = base64Encode(imageBytes);
+        print(base64Image);
+        // postprofile();
+      } else {
+        log('No image selected.');
+      }
+    });
+  }
+
+  void modalBottomSheetMenu() {
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+            height: 150.0,
+            color: Colors.transparent, //could change this to Color(0xFF737373),
+            //so you don't have to change MaterialApp canvasColor
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.image),
+                  title: const Text("Gallery"),
+                  onTap: () {
+                    Navigator.pop(context);
+                    getImagefromGallery();
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text("Camera"),
+                  onTap: () {
+                    Navigator.pop(context);
+                    getImageFromCamera();
+                  },
+                )
+              ],
+            ),
+          );
+        });
   }
 
   @override
@@ -118,7 +197,7 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                       border: Border.all(
                           color: const Color.fromRGBO(255, 140, 0, 1),
                           width: 2)),
-                  child: pickedFile == null
+                  child: _image == null
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -128,7 +207,7 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                                 color: Colors.grey,
                               ),
                               onPressed: () {
-                                selectFile();
+                                modalBottomSheetMenu();
                               },
                             ),
                             const Text("Add Image")
@@ -136,7 +215,7 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                         )
                       : InkWell(
                           onTap: () {
-                            selectFile();
+                            modalBottomSheetMenu();
                           },
                           child: Container(
                             alignment: Alignment.bottomRight,
@@ -148,10 +227,10 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                                   width: 1,
                                 ),
                                 image: DecorationImage(
-                                    image: FileImage(
-                                      File(pickedFile!.path!),
-                                    ),
-                                    fit: BoxFit.fill)),
+                                    image: _image == null
+                                        ? NetworkImage(image) as ImageProvider
+                                        : FileImage(_image!),
+                                    fit: BoxFit.cover)),
                             child: const Icon(
                               Icons.mode_edit_outlined,
                               color: Colors.white,
@@ -196,78 +275,82 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                   height: 20,
                 ),
                 Container(
-                    alignment: Alignment.centerLeft,
-                    margin: const EdgeInsets.symmetric(horizontal: 15),
-                    child: const Text(
-                      "Unit Name*",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    )),
-                DropdownButton(
-                  // Initial Value
-                  value: unitMasterValue,
-                  // Down Arrow Icon
-                  icon: const Icon(Icons.keyboard_arrow_down),
-                  // Array list of items
-                  items: unitMasterList.map((items) {
-                    return DropdownMenuItem(
-                      value: items['unit'],
-                      child: SizedBox(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.symmetric(horizontal: 15),
+                  child: const Text(
+                    "Unit Name*",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Card(
+                  child: DropdownButton(
+                    value: unitMasterValue,
+                    underline: const SizedBox(),
+                    icon: const Icon(Icons.keyboard_arrow_down),
+                    items: unitMasterList.map((items) {
+                      return DropdownMenuItem(
+                        value: items['unit'],
+                        child: SizedBox(
                           height: height * 0.09,
                           width: width * 0.87,
                           child: Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              alignment: Alignment.centerLeft,
-                              child: Text(items['unit']))),
-                    );
-                  }).toList(),
-                  // After selecting the desired option,it will
-                  // change button value to selected value
-                  onChanged: (newValue) {
-                    setState(() {
-                      unitMasterValue = newValue.toString();
-                    });
-                  },
+                            margin: const EdgeInsets.symmetric(horizontal: 20),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              items['unit'],
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    // After selecting the desired option,it will
+                    // change button value to selected value
+                    onChanged: (newValue) {
+                      setState(() {
+                        unitMasterValue = newValue.toString();
+                      });
+                    },
+                  ),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                Container(
-                    alignment: Alignment.centerLeft,
-                    margin: const EdgeInsets.symmetric(horizontal: 15),
-                    child: const Text(
-                      "Company Name*",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    )),
-                DropdownButton(
-                  // Initial Value
-                  value: dropdownvalue,
-                  // Down Arrow Icon
-                  icon: const Icon(Icons.keyboard_arrow_down),
-                  // Array list of items
-                  items: userCompanyList.map((items) {
-                    return DropdownMenuItem(
-                      value: items['firm_name'],
-                      child: SizedBox(
-                          height: height * 0.09,
-                          width: width * 0.87,
-                          child: Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              alignment: Alignment.centerLeft,
-                              child: Text(items['firm_name']))),
-                    );
-                  }).toList(),
-                  // After selecting the desired option,it will
-                  // change button value to selected value
-                  onChanged: (newValue) {
-                    setState(() {
-                      dropdownvalue = newValue.toString();
-                    });
-                  },
-                ),
+                // Container(
+                //     alignment: Alignment.centerLeft,
+                //     margin: const EdgeInsets.symmetric(horizontal: 15),
+                //     child: const Text(
+                //       "Company Name*",
+                //       style:
+                //           TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                //     )),
+                // DropdownButton(
+                //   // Initial Value
+                //   value: dropdownvalue,
+                //   // Down Arrow Icon
+                //   icon: const Icon(Icons.keyboard_arrow_down),
+                //   // Array list of items
+                //   items: userCompanyList.map((items) {
+                //     return DropdownMenuItem(
+                //       value: items['firm_name'],
+                //       child: SizedBox(
+                //           height: height * 0.09,
+                //           width: width * 0.87,
+                //           child: Container(
+                //               margin:
+                //                   const EdgeInsets.symmetric(horizontal: 20),
+                //               alignment: Alignment.centerLeft,
+                //               child: Text(items['firm_name']))),
+                //     );
+                //   }).toList(),
+                //   // After selecting the desired option,it will
+                //   // change button value to selected value
+                //   onChanged: (newValue) {
+                //     setState(() {
+                //       dropdownvalue = newValue.toString();
+                //     });
+                //   },
+                // ),
+
                 const SizedBox(
                   height: 40,
                 ),
@@ -284,7 +367,7 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
     return InkWell(
       onTap: () {
         if (_formKey.currentState!.validate()) {
-          if (pickedFile == null) {
+          if (base64Image == "") {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 backgroundColor: Appcolors.primaryColor,
                 content: Text(
@@ -292,14 +375,13 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 )));
           } else {
-            if (dropdownvalue != "Select" && unitMasterValue != "Select") {
-              uploadFile();
+            if (unitMasterValue != "Select") {
               saveItemMasterData();
             } else {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   backgroundColor: Appcolors.primaryColor,
                   content: Text(
-                    "Please Select the company or unit Name !!",
+                    "Please Select the unit Name !!",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   )));
             }
@@ -339,8 +421,8 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
     final userDoc = FirebaseFirestore.instance.collection('itemMaster').doc();
 
     final json = {
-      'company_name': dropdownvalue.toString(),
-      'image_link': pickedFile.toString(),
+      'company_name': "",
+      'image_link': base64Image.toString(),
       'item_name': itemNameController.text.toString(),
       'unit_name': unitMasterValue.toString(),
     };

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_test/models/unit_master_model.dart';
 import 'package:demo_test/screens/masterTab/unit_master_screen.dart';
+import 'package:demo_test/screens/masterTab/update_unit_master_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/app_color.dart';
@@ -45,11 +46,12 @@ class _UnitMasterDetailsScreenState extends State<UnitMasterDetailsScreen> {
       ),
       body: StreamBuilder<List<UnitMaster>>(
         stream: getUserDetails(),
-        builder: (context, snapshot) {
+        builder: (context, snapshot,) {
           if (snapshot.hasError) {
             return Text('Something went error--->${snapshot.error}');
           } else if (snapshot.hasData) {
             final users = snapshot.data!;
+            // print(snapshot.data.documents[0].id)
             return ListView(
               physics: const BouncingScrollPhysics(),
               children: users.map(itemMasterWidget).toList(),
@@ -72,9 +74,19 @@ class _UnitMasterDetailsScreenState extends State<UnitMasterDetailsScreen> {
       decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade400),
           borderRadius: BorderRadius.circular(5)),
-      child: ListTile(
-        title: Text(user.unit),
-        trailing: Text(user.action.toString()),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => UpdateUnitMasterScreen(
+                        unitName: user.unit,
+                      )));
+        },
+        child: ListTile(
+          title: Text(user.unit),
+          trailing: Text(user.action.toString()),
+        ),
       ),
     );
   }
@@ -82,7 +94,6 @@ class _UnitMasterDetailsScreenState extends State<UnitMasterDetailsScreen> {
   Stream<List<UnitMaster>> getUserDetails() => FirebaseFirestore.instance
       .collection('unitMaster')
       .snapshots()
-      .map((snapshot) => snapshot.docs
-          .map((doc) => UnitMaster.fromJson(doc.data()))
-          .toList());
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => UnitMaster.fromJson(doc.data())).toList());
 }

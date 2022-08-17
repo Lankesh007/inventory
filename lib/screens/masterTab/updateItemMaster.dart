@@ -1,22 +1,28 @@
+// ignore: file_names
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_test/utils/app_color.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
-
 class UpdateItemMasterScreen extends StatefulWidget {
-  const UpdateItemMasterScreen({Key? key}) : super(key: key);
-
+  final String itemName;
+  final String unitName;
+  final String companyName;
+  const UpdateItemMasterScreen(
+      {required this.companyName,
+      required this.itemName,
+      required this.unitName,
+      Key? key})
+      : super(key: key);
   @override
   State<UpdateItemMasterScreen> createState() => _UpdateItemMasterScreenState();
 }
 
 class _UpdateItemMasterScreenState extends State<UpdateItemMasterScreen> {
-   double height = 0;
+  double height = 0;
   double width = 0;
   bool loading = false;
   String dropdownvalue = 'Select';
@@ -46,6 +52,8 @@ class _UpdateItemMasterScreenState extends State<UpdateItemMasterScreen> {
   }
 
   final itemNameController = TextEditingController();
+  final unitNameController = TextEditingController();
+  final comapnyNameController = TextEditingController();
 
   List unitMasterList = [];
 
@@ -82,6 +90,10 @@ class _UpdateItemMasterScreenState extends State<UpdateItemMasterScreen> {
 
   @override
   void initState() {
+
+    comapnyNameController.text=widget.companyName;
+    itemNameController.text=widget.itemName;
+    unitNameController.text=widget.unitName;
     _getUnimasterData();
     _getUsersData();
     super.initState();
@@ -184,9 +196,9 @@ class _UpdateItemMasterScreenState extends State<UpdateItemMasterScreen> {
                         return null;
                       },
                       controller: itemNameController,
-                      decoration: const InputDecoration(
-                          hintText: "Item Name",
-                          hintStyle: TextStyle(fontSize: 14),
+                      decoration: InputDecoration(
+                          hintText: widget.itemName,
+                          hintStyle: const TextStyle(fontSize: 14),
                           border: InputBorder.none),
                     ),
                   ),
@@ -202,32 +214,26 @@ class _UpdateItemMasterScreenState extends State<UpdateItemMasterScreen> {
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     )),
-                DropdownButton(
-                  // Initial Value
-                  value: unitMasterValue,
-                  // Down Arrow Icon
-                  icon: const Icon(Icons.keyboard_arrow_down),
-                  // Array list of items
-                  items: unitMasterList.map((items) {
-                    return DropdownMenuItem(
-                      value: items['unit'],
-                      child: SizedBox(
-                          height: height * 0.09,
-                          width: width * 0.87,
-                          child: Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              alignment: Alignment.centerLeft,
-                              child: Text(items['unit']))),
-                    );
-                  }).toList(),
-                  // After selecting the desired option,it will
-                  // change button value to selected value
-                  onChanged: (newValue) {
-                    setState(() {
-                      unitMasterValue = newValue.toString();
-                    });
-                  },
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  height: height * 0.08,
+                  width: width,
+                  child: Card(
+                    child: TextFormField(
+                      textAlign: TextAlign.center,
+                      validator: (text) {
+                        if (text == null || text.isEmpty) {
+                          return 'Unit is required!';
+                        }
+                        return null;
+                      },
+                      controller: unitNameController,
+                      decoration: InputDecoration(
+                          hintText: widget.unitName,
+                          hintStyle: const TextStyle(fontSize: 14),
+                          border: InputBorder.none),
+                    ),
+                  ),
                 ),
                 const SizedBox(
                   height: 20,
@@ -240,37 +246,34 @@ class _UpdateItemMasterScreenState extends State<UpdateItemMasterScreen> {
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     )),
-                DropdownButton(
-                  // Initial Value
-                  value: dropdownvalue,
-                  // Down Arrow Icon
-                  icon: const Icon(Icons.keyboard_arrow_down),
-                  // Array list of items
-                  items: userCompanyList.map((items) {
-                    return DropdownMenuItem(
-                      value: items['firm_name'],
-                      child: SizedBox(
-                          height: height * 0.09,
-                          width: width * 0.87,
-                          child: Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              alignment: Alignment.centerLeft,
-                              child: Text(items['firm_name']))),
-                    );
-                  }).toList(),
-                  // After selecting the desired option,it will
-                  // change button value to selected value
-                  onChanged: (newValue) {
-                    setState(() {
-                      dropdownvalue = newValue.toString();
-                    });
-                  },
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  height: height * 0.08,
+                  width: width,
+                  child: Card(
+                    child: TextFormField(
+                      textAlign: TextAlign.center,
+                      validator: (text) {
+                        if (text == null || text.isEmpty) {
+                          return 'Company Name is required!';
+                        }
+                        return null;
+                      },
+                      controller: comapnyNameController,
+                      decoration: InputDecoration(
+                          hintText: widget.companyName,
+                          hintStyle: const TextStyle(fontSize: 14),
+                          border: InputBorder.none),
+                    ),
+                  ),
                 ),
                 const SizedBox(
-                  height: 40,
+                  height: 20,
                 ),
                 submitButtonWidget(),
+                  const SizedBox(
+                  height: 20,
+                ),
               ],
             ),
           ),
@@ -283,26 +286,10 @@ class _UpdateItemMasterScreenState extends State<UpdateItemMasterScreen> {
     return InkWell(
       onTap: () {
         if (_formKey.currentState!.validate()) {
-          if (pickedFile == null) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                backgroundColor: Appcolors.primaryColor,
-                content: Text(
-                  "Please Select the Image !!",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                )));
-          } else {
-            if (dropdownvalue != "Select" && unitMasterValue != "Select") {
-              uploadFile();
-              saveItemMasterData();
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  backgroundColor: Appcolors.primaryColor,
-                  content: Text(
-                    "Please Select the company or unit Name !!",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  )));
-            }
-          }
+   
+              // uploadFile();
+              updateItemMaster();
+           
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               backgroundColor: Appcolors.primaryColor,
@@ -331,22 +318,19 @@ class _UpdateItemMasterScreenState extends State<UpdateItemMasterScreen> {
     );
   }
 
-  Future saveItemMasterData() async {
+  Future updateItemMaster() async {
     setState(() {
       loading = true;
     });
-    final userDoc = FirebaseFirestore.instance.collection('itemMaster').doc();
-
-    final json = {
-      'company_name': dropdownvalue.toString(),
-      'image_link': pickedFile.toString(),
+    FirebaseFirestore.instance.collection('itemMaster').doc().update({
+      'company_name': comapnyNameController.text.toString(),
       'item_name': itemNameController.text.toString(),
-      'unit_name': unitMasterValue.toString(),
-    };
+      'unit_name': unitNameController.text.toString(),
+      'image_link':"",
+    });
 
-    await userDoc.set(json);
-
-    Navigator.pop(context);
+    // ignore: use_build_context_synchronously
+    // Navigator.pop(context);
     setState(() {
       loading = false;
     });

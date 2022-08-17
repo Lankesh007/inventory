@@ -40,7 +40,9 @@ dependencies:
   shared_preferences: ^2.0.15
   file_picker: ^5.0.1
   firebase_storage: ^10.3.4
-
+  image_picker: ^0.7.5+3
+  date_time_picker: ^2.1.0
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

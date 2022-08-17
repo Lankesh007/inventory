@@ -4,7 +4,7 @@ import 'app.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavigation extends StatelessWidget {
-  BottomNavigation({
+  const BottomNavigation({
     required this.onSelectTab,
     required this.tabs,
   });

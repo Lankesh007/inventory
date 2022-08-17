@@ -24,7 +24,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
              const Text(
                 "Home Page",
               ),
-              SizedBox(height: 50,),
+            const  SizedBox(height: 50,),
               InkWell(
                 onTap: (){
                Navigator.push(

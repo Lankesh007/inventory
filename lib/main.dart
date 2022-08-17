@@ -14,14 +14,17 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Inventory Management',
-      theme: ThemeData(
-        fontFamily: "regular",
-        primarySwatch: Colors.blue,
+    return GestureDetector(
+      onTap: (){},
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Inventory Management',
+        theme: ThemeData(
+          fontFamily: "regular",
+          primarySwatch: Colors.blue,
+        ),
+        home: const LoginScreen(),
       ),
-      home: const LoginScreen(),
     );
   }
 

@@ -8,6 +8,8 @@ import '../screens/masterTab/master_screen.dart';
 import 'tab_item.dart';
 
 class App extends StatefulWidget {
+  const App({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => AppState();
 }
@@ -22,13 +24,14 @@ class AppState extends State<App> {
     TabItem(
       tabName: "Home",
       icon: Icons.home,
-      page:const HomePageScreen(),
+      page: const HomePageScreen(),
     ),
-       TabItem(
+    TabItem(
       tabName: "Master",
       icon: Icons.manage_history_rounded,
       page: const MasterScreen(),
-    ),   TabItem(
+    ),
+    TabItem(
       tabName: "Inventory",
       icon: Icons.inventory,
       page: const InventoryScreen(),
