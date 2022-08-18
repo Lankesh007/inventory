@@ -4,10 +4,10 @@ import 'app.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavigation extends StatelessWidget {
-  const BottomNavigation({
+  const BottomNavigation({Key? key, 
     required this.onSelectTab,
     required this.tabs,
-  });
+  }) : super(key: key);
   final ValueChanged<int> onSelectTab;
   final List<TabItem> tabs;
 

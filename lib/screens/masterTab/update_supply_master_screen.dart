@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
 
 class UpdateSupplyMasterScreen extends StatefulWidget {
   const UpdateSupplyMasterScreen({Key? key}) : super(key: key);
@@ -13,6 +12,6 @@ class UpdateSupplyMasterScreen extends StatefulWidget {
 class _UpdateSupplyMasterScreenState extends State<UpdateSupplyMasterScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return const Scaffold();
   }
 }

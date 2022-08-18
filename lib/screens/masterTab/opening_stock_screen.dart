@@ -2,9 +2,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_test/utils/app_color.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'dart:math' as math;
 
 class OpeningStockScreen extends StatefulWidget {
   const OpeningStockScreen({Key? key}) : super(key: key);
@@ -198,7 +196,7 @@ class _OpeningStockScreenState extends State<OpeningStockScreen> {
               const Divider(
                 color: Colors.black,
               ),
-              Container(
+              SizedBox(
                 width: width * 0.8,
                 child: DropdownButton(
                   underline: const SizedBox(),

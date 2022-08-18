@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -37,29 +39,7 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
   String image = "";
   String base64Image = "";
 
-  // Future uploadFile() async {
-  //   final path = 'files/${pickedFile!.path}';
-  //   final file = File(pickedFile!.path!);
 
-  //   final ref = FirebaseStorage.instance.ref().child(path);
-  //   final uploadTask = ref.putFile(file);
-
-  //   final snapShot = await uploadTask.whenComplete(() => () {});
-  //   final urlDownload = await snapShot.ref.getDownloadURL();
-  //   log('Image download link---->$urlDownload');
-
-  //   // setState(() {
-  //   //   if (pickedFile != null) {
-  //   //     _image = File(pickedFile!.path!);
-  //   //     var imageBytes = _image!.readAsBytesSync();
-  //   //     base64Image = base64Encode(imageBytes);
-  //   //     log("base 64 image=====>$base64Image");
-  //   //     // postprofile();
-  //   //   } else {
-  //   //     print('No image selected.');
-  //   //   }
-  //   // });
-  // }
 
   final itemNameController = TextEditingController();
 
@@ -120,7 +100,7 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
         _image = File(pickedFile.path);
         var imageBytes = _image!.readAsBytesSync();
         base64Image = base64Encode(imageBytes);
-        print(base64Image);
+        log(base64Image);
         // postprofile();
       } else {
         log('No image selected.');

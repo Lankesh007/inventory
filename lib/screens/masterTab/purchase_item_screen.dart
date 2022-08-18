@@ -133,7 +133,7 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
             width: width * 0.96,
             child: Card(
               child: DropdownButton(
-                underline: SizedBox(),
+                underline:const SizedBox(),
                 // Initial Value
                 value: unitMasterValue,
                 // Down Arrow Icon

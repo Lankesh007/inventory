@@ -3,7 +3,7 @@ import 'package:demo_test/models/item_master_model.dart';
 import 'package:demo_test/screens/masterTab/item_master_screen.dart';
 import 'package:demo_test/utils/app_color.dart';
 import 'package:flutter/material.dart';
-import 'updateItemMaster.dart';
+import 'update_item_master.dart';
 
 class ItemMasterDetailsScreen extends StatefulWidget {
   const ItemMasterDetailsScreen({Key? key}) : super(key: key);

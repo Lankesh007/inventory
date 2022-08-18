@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -12,8 +10,6 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold();
-    
+    return const Scaffold();
   }
 }

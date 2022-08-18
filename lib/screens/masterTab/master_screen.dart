@@ -1,4 +1,6 @@
+import 'package:demo_test/screens/masterTab/category_master_screen.dart';
 import 'package:demo_test/screens/masterTab/item_master_details_screen.dart';
+import 'package:demo_test/screens/masterTab/json_test.dart';
 import 'package:demo_test/screens/masterTab/opening_stock_screen.dart';
 import 'package:demo_test/screens/masterTab/purchase_item_screen.dart';
 import 'package:demo_test/screens/masterTab/supplies_master_screen.dart';
@@ -73,20 +75,25 @@ class _MasterScreenState extends State<MasterScreen> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: height * 0.15,
-                width: width * 0.45,
-                child: Card(
-                  elevation: 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text(
-                        "Category Master",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      )
-                    ],
+              InkWell(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const CategoryMasterScreen()));
+                },
+                child: SizedBox(
+                  height: height * 0.15,
+                  width: width * 0.45,
+                  child: Card(
+                    elevation: 5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Category Master",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -240,28 +247,28 @@ class _MasterScreenState extends State<MasterScreen> {
                   ),
                 ),
               ),
-              // InkWell(
-              //   onTap: (){
-              //     Navigator.push(context, MaterialPageRoute(builder: (context)=>const OpeningStockScreen()));
-              //   },
-              //   child: SizedBox(
-              //     height: height * 0.15,
-              //     width: width * 0.45,
-              //     child: Card(
-              //       elevation: 5,
-              //       child: Column(
-              //         mainAxisAlignment: MainAxisAlignment.center,
-              //         children: const [
-              //           Text(
-              //             "Opening Stock",
-              //             style: TextStyle(
-              //                 fontSize: 18, fontWeight: FontWeight.bold),
-              //           )
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // ),
+              InkWell(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const JsonTestScreen()));
+                },
+                child: SizedBox(
+                  height: height * 0.15,
+                  width: width * 0.45,
+                  child: Card(
+                    elevation: 5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Json Test",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

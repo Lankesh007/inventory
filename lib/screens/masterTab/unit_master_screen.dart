@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_test/utils/app_color.dart';
@@ -65,11 +67,14 @@ class _UnitMasterScreenState extends State<UnitMasterScreen> {
                         ),
                       ),
                     ),
-                    switchButtonWidget(),
                   ],
                 ),
               ),
               unitTextFieldWidget(),
+              const SizedBox(
+                height: 10,
+              ),
+              switchButtonWidget(),
               const SizedBox(
                 height: 20,
               ),
@@ -178,7 +183,6 @@ class _UnitMasterScreenState extends State<UnitMasterScreen> {
     };
 
     await userDoc.set(json);
-    // ignore: use_build_context_synchronously
     setState(() {
       clearText();
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -189,7 +193,7 @@ class _UnitMasterScreenState extends State<UnitMasterScreen> {
           )));
     });
 
-   Navigator.pop(context);
+    Navigator.pop(context);
     setState(() {
       loading = false;
     });

@@ -49,7 +49,7 @@ class _TaxDetailsScreenState extends State<TaxDetailsScreen> {
           } else if (snapshot.hasData) {
             final users = snapshot.data!;
 
-            print("");
+            
             return ListView(
               physics: const BouncingScrollPhysics(),
               children: users.map(itemMasterWidget).toList(),

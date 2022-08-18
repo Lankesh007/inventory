@@ -207,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     var value = Random();
     var otp = value.nextInt(9000) + 1000;
-    print("----->$otp");
+    log(otp);
     if (phoneNumberController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           backgroundColor: Appcolors.primaryColor,
