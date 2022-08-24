@@ -1,21 +1,20 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:demo_test/models/item_master_model.dart';
-import 'package:demo_test/screens/masterTab/item_master_screen.dart';
+import 'package:demo_test/models/category_master_model.dart';
+import 'package:demo_test/screens/masterTab/category_master_screen.dart';
 import 'package:demo_test/utils/app_color.dart';
 import 'package:flutter/material.dart';
 
 
-class ItemMasterDetailsScreen extends StatefulWidget {
-  const ItemMasterDetailsScreen({Key? key}) : super(key: key);
+class CategoryListScreen extends StatefulWidget {
+  const CategoryListScreen({Key? key}) : super(key: key);
 
   @override
-  State<ItemMasterDetailsScreen> createState() =>
-      _ItemMasterDetailsScreenState();
+  State<CategoryListScreen> createState() => _CategoryListScreenState();
 }
 
-class _ItemMasterDetailsScreenState extends State<ItemMasterDetailsScreen> {
+class _CategoryListScreenState extends State<CategoryListScreen> {
   double height = 0;
   double width = 0;
   @override
@@ -26,26 +25,26 @@ class _ItemMasterDetailsScreenState extends State<ItemMasterDetailsScreen> {
       appBar: AppBar(
         backgroundColor: Appcolors.primaryColor,
         title: const Text(
-          "Item Master Details ",
+          "Category Master",
           style: TextStyle(
-              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ItemMasterScreen()));
-              },
-              icon: const Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 30,
-              ))
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CategoryMasterScreen()));
+            },
+            icon: const Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+          )
         ],
       ),
-      body: StreamBuilder<List<ItemMasterModel>>(
+      body: StreamBuilder<List<CategoryMasterModel>>(
         stream: getUserDetails(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -66,7 +65,7 @@ class _ItemMasterDetailsScreenState extends State<ItemMasterDetailsScreen> {
     );
   }
 
-  Widget itemMasterWidget(ItemMasterModel item) {
+  Widget itemMasterWidget(CategoryMasterModel item) {
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
         height: height * 0.15,
@@ -85,11 +84,12 @@ class _ItemMasterDetailsScreenState extends State<ItemMasterDetailsScreen> {
                     decoration: BoxDecoration(
                         image: DecorationImage(
                             image: MemoryImage(
-                              base64Decode(item.imageLink),
+                              base64Decode(item.categoryImage),
                             ),
                             fit: BoxFit.cover),
                         borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(5),bottomLeft: Radius.circular(5))),
+                            topLeft: Radius.circular(5),
+                            bottomLeft: Radius.circular(5))),
                   ),
                   // const SizedBox(
                   //   height: 10,
@@ -124,60 +124,22 @@ class _ItemMasterDetailsScreenState extends State<ItemMasterDetailsScreen> {
                       ],
                     ),
                   ),
+                
                   Container(
                     margin:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     width: width * 0.55,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "item:",
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
+                       
                         Text(
-                          item.itemName,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          item.categoryDescription,
+                          style: const TextStyle(),
                         ),
                       ],
                     ),
                   ),
-                  Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    width: width * 0.55,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "unit:",
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          item.unitName,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Container(
-                  //   margin:
-                  //       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  //   width: width * 0.55,
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //     children: [
-                  //       const Text(
-                  //         "tax:",
-                  //         style: TextStyle(fontWeight: FontWeight.w600),
-                  //       ),
-                  //       Text(
-                  //         item.itemTax,
-                  //         style: const TextStyle(fontWeight: FontWeight.w600),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
                 ],
               ),
             ],
@@ -185,10 +147,9 @@ class _ItemMasterDetailsScreenState extends State<ItemMasterDetailsScreen> {
         ));
   }
 
-  Stream<List<ItemMasterModel>> getUserDetails() => FirebaseFirestore.instance
-      .collection('itemMaster')
-      .snapshots()
-      .map((snapshot) => snapshot.docs
-          .map((doc) => ItemMasterModel.fromJson(doc.data()))
-          .toList());
+  Stream<List<CategoryMasterModel>> getUserDetails() =>
+      FirebaseFirestore.instance.collection('categoryMaster').snapshots().map(
+          (snapshot) => snapshot.docs
+              .map((doc) => CategoryMasterModel.fromJson(doc.data()))
+              .toList());
 }

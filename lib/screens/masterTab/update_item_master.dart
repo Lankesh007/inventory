@@ -9,9 +9,8 @@ import 'package:flutter/material.dart';
 class UpdateItemMasterScreen extends StatefulWidget {
   final String itemName;
   final String unitName;
-  final String companyName;
   const UpdateItemMasterScreen(
-      {required this.companyName,
+      {
       required this.itemName,
       required this.unitName,
       Key? key})
@@ -90,7 +89,6 @@ class _UpdateItemMasterScreenState extends State<UpdateItemMasterScreen> {
   @override
   void initState() {
 
-    comapnyNameController.text=widget.companyName;
     itemNameController.text=widget.itemName;
     unitNameController.text=widget.unitName;
     _getUnimasterData();
@@ -245,27 +243,7 @@ class _UpdateItemMasterScreenState extends State<UpdateItemMasterScreen> {
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     )),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  height: height * 0.08,
-                  width: width,
-                  child: Card(
-                    child: TextFormField(
-                      textAlign: TextAlign.center,
-                      validator: (text) {
-                        if (text == null || text.isEmpty) {
-                          return 'Company Name is required!';
-                        }
-                        return null;
-                      },
-                      controller: comapnyNameController,
-                      decoration: InputDecoration(
-                          hintText: widget.companyName,
-                          hintStyle: const TextStyle(fontSize: 14),
-                          border: InputBorder.none),
-                    ),
-                  ),
-                ),
+              
                 const SizedBox(
                   height: 20,
                 ),

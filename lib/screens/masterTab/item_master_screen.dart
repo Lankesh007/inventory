@@ -22,6 +22,8 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
   bool loading = false;
   String dropdownvalue = 'Select';
   String unitMasterValue = "Select";
+  String catergoryNameValue = "Select";
+  String taxNameValue = "Select";
   final _formKey = GlobalKey<FormState>();
   final picker = ImagePicker();
 
@@ -38,14 +40,11 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
   File? _image;
   String image = "";
   String base64Image = "";
-
-
-
   final itemNameController = TextEditingController();
-
   List unitMasterList = [];
-
+  List categoryMasterList = [];
   List userCompanyList = [];
+  List taxMasterList = [];
 
   _getUnimasterData() {
     var data = FirebaseFirestore.instance.collection('unitMaster').get();
@@ -55,6 +54,33 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
         unitMasterList.clear();
         unitMasterList.add({"unit": "Select", "action": true});
         unitMasterList.addAll(value.docs);
+      });
+    });
+  }
+
+  _getTaxMasterData() {
+    var data = FirebaseFirestore.instance.collection('taxMaster').get();
+    data.then((value) {
+      setState(() {
+        taxMasterList.clear();
+        taxMasterList.add({
+          "taxName": "Select",
+        });
+        taxMasterList.addAll(value.docs);
+      });
+    });
+  }
+
+  _getCategoryData() {
+    var data = FirebaseFirestore.instance.collection('categoryMaster').get();
+
+    data.then((value) {
+      setState(() {
+        categoryMasterList.clear();
+        categoryMasterList.add({
+          "category_name": "Select",
+        });
+        categoryMasterList.addAll(value.docs);
       });
     });
   }
@@ -77,15 +103,14 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
   }
 
   Future getImagefromGallery() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await picker.getImage(
+        source: ImageSource.gallery, maxHeight: 1024, maxWidth: 1024);
 
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
         var imageBytes = _image!.readAsBytesSync();
         base64Image = base64Encode(imageBytes);
-        log(base64Image);
-        // postprofile();
       } else {
         log('No image selected.');
       }
@@ -93,15 +118,14 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
   }
 
   Future getImageFromCamera() async {
-    final pickedFile = await picker.getImage(source: ImageSource.camera);
+    final pickedFile = await picker.getImage(
+        source: ImageSource.camera, maxHeight: 1024, maxWidth: 1024);
 
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
         var imageBytes = _image!.readAsBytesSync();
         base64Image = base64Encode(imageBytes);
-        log(base64Image);
-        // postprofile();
       } else {
         log('No image selected.');
       }
@@ -122,7 +146,7 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                   leading: const Icon(Icons.image),
                   title: const Text("Gallery"),
                   onTap: () {
-                    Navigator.pop(context);
+                    (Navigator.pop(context));
                     getImagefromGallery();
                   },
                 ),
@@ -143,7 +167,9 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
   @override
   void initState() {
     _getUnimasterData();
+    _getCategoryData();
     _getUsersData();
+    _getTaxMasterData();
     super.initState();
   }
 
@@ -166,11 +192,9 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
             key: _formKey,
             child: Column(
               children: [
-                const SizedBox(
-                  height: 3,
-                ),
+                const SizedBox(height: 10),
                 Container(
-                  height: height * 0.35,
+                  height: height * 0.3,
                   width: width * 0.99,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(0),
@@ -223,6 +247,44 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                   height: 20,
                 ),
                 Container(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.symmetric(horizontal: 15),
+                  child: const Text(
+                    "Category Name*",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Card(
+                  child: DropdownButton(
+                    value: catergoryNameValue,
+                    underline: const SizedBox(),
+                    icon: const Icon(Icons.keyboard_arrow_down),
+                    items: categoryMasterList.map((items) {
+                      return DropdownMenuItem(
+                        value: items['category_name'],
+                        child: SizedBox(
+                          height: height * 0.09,
+                          width: width * 0.87,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 20),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              items['category_name'],
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    // After selecting the desired option,it will
+                    // change button value to selected value
+                    onChanged: (newValue) {
+                      setState(() {
+                        catergoryNameValue = newValue.toString();
+                      });
+                    },
+                  ),
+                ),
+                Container(
                     alignment: Alignment.centerLeft,
                     margin: const EdgeInsets.symmetric(horizontal: 15),
                     child: const Text(
@@ -236,7 +298,6 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                   width: width,
                   child: Card(
                     child: TextFormField(
-                      textAlign: TextAlign.center,
                       validator: (text) {
                         if (text == null || text.isEmpty) {
                           return 'item is required!';
@@ -245,14 +306,11 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                       },
                       controller: itemNameController,
                       decoration: const InputDecoration(
-                          hintText: "Item Name",
+                          hintText: "   Enter Item Name",
                           hintStyle: TextStyle(fontSize: 14),
                           border: InputBorder.none),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 20,
                 ),
                 Container(
                   alignment: Alignment.centerLeft,
@@ -293,48 +351,53 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
                 // Container(
-                //     alignment: Alignment.centerLeft,
-                //     margin: const EdgeInsets.symmetric(horizontal: 15),
-                //     child: const Text(
-                //       "Company Name*",
-                //       style:
-                //           TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                //     )),
-                // DropdownButton(
-                //   // Initial Value
-                //   value: dropdownvalue,
-                //   // Down Arrow Icon
-                //   icon: const Icon(Icons.keyboard_arrow_down),
-                //   // Array list of items
-                //   items: userCompanyList.map((items) {
-                //     return DropdownMenuItem(
-                //       value: items['firm_name'],
-                //       child: SizedBox(
+                //   alignment: Alignment.centerLeft,
+                //   margin: const EdgeInsets.symmetric(horizontal: 15),
+                //   child: const Text(
+                //     "Tax Name",
+                //     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                //   ),
+                // ),
+                // Card(
+                //   child: DropdownButton(
+                //     value: taxNameValue,
+                //     underline: const SizedBox(),
+                //     icon: const Icon(Icons.keyboard_arrow_down),
+                //     items: taxMasterList.map((items) {
+                //       return DropdownMenuItem(
+                //         value: items['taxName'],
+                //         child: SizedBox(
                 //           height: height * 0.09,
                 //           width: width * 0.87,
                 //           child: Container(
-                //               margin:
-                //                   const EdgeInsets.symmetric(horizontal: 20),
-                //               alignment: Alignment.centerLeft,
-                //               child: Text(items['firm_name']))),
-                //     );
-                //   }).toList(),
-                //   // After selecting the desired option,it will
-                //   // change button value to selected value
-                //   onChanged: (newValue) {
-                //     setState(() {
-                //       dropdownvalue = newValue.toString();
-                //     });
-                //   },
+                //             margin: const EdgeInsets.symmetric(horizontal: 20),
+                //             alignment: Alignment.centerLeft,
+                //             child: Text(
+                //               items['taxName'],
+                //             ),
+                //           ),
+                //         ),
+                //       );
+                //     }).toList(),
+                //     // After selecting the desired option,it will
+                //     // change button value to selected value
+                //     onChanged: (newValue) {
+                //       setState(() {
+                //         taxNameValue = newValue.toString();
+                //       });
+                //     },
+                //   ),
                 // ),
-
                 const SizedBox(
                   height: 40,
                 ),
                 submitButtonWidget(),
+                const SizedBox(
+                  height: 40,
+                ),
               ],
             ),
           ),
@@ -356,14 +419,16 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
                 )));
           } else {
             if (unitMasterValue != "Select") {
-              saveItemMasterData();
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  backgroundColor: Appcolors.primaryColor,
-                  content: Text(
-                    "Please Select the unit Name !!",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  )));
+              if (catergoryNameValue == "Select") {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    backgroundColor: Appcolors.primaryColor,
+                    content: Text(
+                      "Please Select the unit Name !!",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )));
+              } else {
+                saveItemMasterData();
+              }
             }
           }
         } else {
@@ -401,10 +466,11 @@ class _ItemMasterScreenState extends State<ItemMasterScreen> {
     final userDoc = FirebaseFirestore.instance.collection('itemMaster').doc();
 
     final json = {
-      'company_name': "",
       'image_link': base64Image.toString(),
       'item_name': itemNameController.text.toString(),
       'unit_name': unitMasterValue.toString(),
+      "category_name": catergoryNameValue.toString(),
+      "item_tax": taxNameValue.toString(),
     };
 
     await userDoc.set(json);

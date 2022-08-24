@@ -34,7 +34,6 @@ class _JsonTestScreenState extends State<JsonTestScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     getdata();
@@ -49,6 +48,6 @@ class _JsonTestScreenState extends State<JsonTestScreen> {
           backgroundColor: Appcolors.primaryColor,
           title: const Text("Demo Test"),
         ),
-        body: SizedBox());
+        body:const SizedBox());
   }
 }

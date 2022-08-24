@@ -1,10 +1,10 @@
-import 'package:demo_test/screens/masterTab/category_master_screen.dart';
+import 'package:demo_test/screens/masterTab/category_list_screen.dart';
+import 'package:demo_test/screens/masterTab/customer_list_screen.dart';
 import 'package:demo_test/screens/masterTab/item_master_details_screen.dart';
-import 'package:demo_test/screens/masterTab/json_test.dart';
 import 'package:demo_test/screens/masterTab/opening_stock_screen.dart';
-import 'package:demo_test/screens/masterTab/purchase_item_screen.dart';
+import 'package:demo_test/screens/masterTab/purchase_list_screen.dart';
+import 'package:demo_test/screens/masterTab/sale_screen.dart';
 import 'package:demo_test/screens/masterTab/supplies_master_screen.dart';
-import 'package:demo_test/screens/masterTab/tax_details_screen.dart';
 import 'package:demo_test/screens/masterTab/unit_master_details_screen.dart';
 import 'package:demo_test/utils/app_color.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +17,7 @@ class MasterScreen extends StatefulWidget {
 }
 
 class _MasterScreenState extends State<MasterScreen> {
+  
   double height = 0;
   double width = 0;
 
@@ -77,7 +78,7 @@ class _MasterScreenState extends State<MasterScreen> {
               ),
               InkWell(
                 onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const CategoryMasterScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const CategoryListScreen()));
                 },
                 child: SizedBox(
                   height: height * 0.15,
@@ -169,7 +170,7 @@ class _MasterScreenState extends State<MasterScreen> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const TaxDetailsScreen()));
+                          builder: (context) => const OpeningStockScreen()));
                 },
                 child: SizedBox(
                   height: height * 0.15,
@@ -180,7 +181,7 @@ class _MasterScreenState extends State<MasterScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Text(
-                          "Tax Master",
+                          "Opening Stock",
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         )
@@ -194,7 +195,7 @@ class _MasterScreenState extends State<MasterScreen> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const OpeningStockScreen()));
+                          builder: (context) => const PurchaseListScreen()));
                 },
                 child: SizedBox(
                   height: height * 0.15,
@@ -205,7 +206,7 @@ class _MasterScreenState extends State<MasterScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Text(
-                          "Opening Stock",
+                          "Purchase Master",
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         )
@@ -227,7 +228,7 @@ class _MasterScreenState extends State<MasterScreen> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const PurchaseItemScreen()));
+                          builder: (context) => const CustomerListScreen()));
                 },
                 child: SizedBox(
                   height: height * 0.15,
@@ -238,7 +239,7 @@ class _MasterScreenState extends State<MasterScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Text(
-                          "Purchase Item",
+                          "Customer Master",
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         )
@@ -248,8 +249,11 @@ class _MasterScreenState extends State<MasterScreen> {
                 ),
               ),
               InkWell(
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const JsonTestScreen()));
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SaleScreen()));
                 },
                 child: SizedBox(
                   height: height * 0.15,
@@ -260,7 +264,7 @@ class _MasterScreenState extends State<MasterScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Text(
-                          "Json Test",
+                          "Sale / Issue",
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         )
@@ -269,9 +273,11 @@ class _MasterScreenState extends State<MasterScreen> {
                   ),
                 ),
               ),
+              
             ],
           ),
         ),
+   
       ],
     );
   }

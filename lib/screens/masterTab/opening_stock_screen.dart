@@ -1,8 +1,13 @@
+// ignore_for_file: use_build_context_synchronously, must_call_super
+
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_test/utils/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../../models/item_master_model.dart';
+import '../../models/product.dart';
 
 class OpeningStockScreen extends StatefulWidget {
   const OpeningStockScreen({Key? key}) : super(key: key);
@@ -17,13 +22,14 @@ class _OpeningStockScreenState extends State<OpeningStockScreen> {
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
   List unitMasterList = [];
-  String unitMasterValue = "Select Item" ;
+  String unitMasterValue = "Select Item";
   late FocusNode myFocusNode;
 
   final quantityController = TextEditingController();
   final priceController = TextEditingController();
   final taxController = TextEditingController();
   final barCodeController = TextEditingController();
+  List<ItemMasterModel> itemMAsterList1 = [];
 
   _getUnimasterData() {
     var data = FirebaseFirestore.instance.collection('itemMaster').get();
@@ -45,20 +51,17 @@ class _OpeningStockScreenState extends State<OpeningStockScreen> {
   double totalPrice = 0;
   double netPrice = 0;
   double taxPrice = 0;
+  @override
+
+  void dispose() {
+    myFocusNode.dispose();
+  }
 
   @override
   void initState() {
     _getUnimasterData();
     myFocusNode = FocusNode();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    // Clean up the focus node when the Form is disposed.
-    myFocusNode.dispose();
-
-    super.dispose();
   }
 
   @override
@@ -84,7 +87,7 @@ class _OpeningStockScreenState extends State<OpeningStockScreen> {
               textFieldsWidget(),
               Container(
                 margin:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -160,7 +163,7 @@ class _OpeningStockScreenState extends State<OpeningStockScreen> {
     return Form(
       key: _formKey,
       child: SizedBox(
-        height: height * 0.63,
+        height: height * 0.55,
         width: width * 0.87,
         child: Card(
           elevation: 15,
@@ -217,12 +220,11 @@ class _OpeningStockScreenState extends State<OpeningStockScreen> {
                               child: Text(items['item_name']))),
                     );
                   }).toList(),
-                  // After selecting the desired option,it will
-                  // change button value to selected value
                   onChanged: (newValue) {
                     setState(() {
                       unitMasterValue = newValue.toString();
                     });
+                    getItemMasteId();
                   },
                 ),
               ),
@@ -235,15 +237,7 @@ class _OpeningStockScreenState extends State<OpeningStockScreen> {
                 width: width,
                 child: TextFormField(
                   onChanged: (value) {
-                    setState(() {
-                      quantity = double.parse(quantityController.text);
-                      price = double.parse(priceController.text);
-                      tax = double.parse(taxController.text);
-                      netPrice = quantity * price;
-                      taxPrice = netPrice * tax / 100;
-                      totalPrice = taxPrice + netPrice;
-                      log("----->$totalPrice");
-                    });
+                    
                   },
                   keyboardType: TextInputType.number,
                   validator: (text) {
@@ -270,12 +264,18 @@ class _OpeningStockScreenState extends State<OpeningStockScreen> {
                   onChanged: (value) {
                     setState(() {
                       quantity = double.parse(quantityController.text);
-                      price = double.parse(priceController.text);
-                      tax = double.parse(taxController.text);
-                      netPrice = quantity * price;
-                      taxPrice = netPrice * tax / 100;
-                      totalPrice = taxPrice + netPrice;
-                      log("----->$totalPrice");
+
+                      if (quantityController.text.isEmpty &&
+                          priceController.text.isEmpty) {
+                        totalPrice = 0.0;
+                      } else {
+                        price = double.parse(priceController.text);
+                        // tax = double.parse(taxController.text);
+                        totalPrice = quantity * price;
+                        // taxPrice = netPrice * tax / 100;
+                        // totalPrice = taxPrice + netPrice;
+                        log("----->$totalPrice");
+                      }
                     });
                   },
                   keyboardType: TextInputType.number,
@@ -295,51 +295,52 @@ class _OpeningStockScreenState extends State<OpeningStockScreen> {
               const Divider(
                 color: Colors.black,
               ),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-                height: height * 0.07,
-                width: width,
-                child: TextFormField(
-                  keyboardType: TextInputType.number,
-                  maxLength: 5,
-                  onChanged: (value) {
-                    if (value.length == 2) {
-                      setState(() {
-                        taxController.text = "$value.";
-                        taxController.selection = TextSelection.collapsed(
-                            offset: taxController.text.length);
-                      });
-                    } else if (value.length > 5) {
-                      setState(() {
-                        taxController.clear();
-                      });
-                    }
-                    setState(() {
-                      quantity = double.parse(quantityController.text);
-                      price = double.parse(priceController.text);
-                      tax = double.parse(taxController.text);
-                      netPrice = quantity * price;
-                      taxPrice = netPrice * tax / 100;
-                      totalPrice = taxPrice + netPrice;
-                      log("----->$totalPrice");
-                    });
-                  },
-                  validator: (text) {
-                    if (text == null || text.isEmpty) {
-                      return 'Tax is empty';
-                    }
-                    return null;
-                  },
-                  controller: taxController,
-                  decoration: const InputDecoration(
-                      hintText: "Tax",
-                      hintStyle: TextStyle(fontSize: 14),
-                      border: InputBorder.none),
-                ),
-              ),
-              const Divider(
-                color: Colors.black,
-              ),
+              // Container(
+              //   margin: const EdgeInsets.symmetric(horizontal: 10),
+              //   height: height * 0.07,
+              //   width: width,
+              //   child: TextFormField(
+              //     keyboardType: TextInputType.number,
+              //     maxLength: 5,
+              //     onChanged: (value) {
+              //       if (value.length == 2) {
+              //         setState(() {
+              //           taxController.text = "$value.";
+              //           taxController.selection = TextSelection.collapsed(
+              //               offset: taxController.text.length);
+              //         });
+              //       } else if (value.length > 5) {
+              //         setState(() {
+              //           taxController.clear();
+              //         });
+              //       }
+              //       setState(() {
+              //         quantity = double.parse(quantityController.text);
+              //         price = double.parse(priceController.text);
+              //         tax = double.parse(taxController.text);
+              //         netPrice = quantity * price;
+              //         taxPrice = netPrice * tax / 100;
+              //         totalPrice = taxPrice + netPrice;
+              //         log("----->$totalPrice");
+              //       });
+              //     },
+              //     validator: (text) {
+              //       if (text == null || text.isEmpty) {
+              //         return 'Tax is empty';
+              //       }
+              //       return null;
+              //     },
+              //     controller: taxController,
+              //     decoration: const InputDecoration(
+              //         hintText: "Tax",
+              //         hintStyle: TextStyle(fontSize: 14),
+              //         border: InputBorder.none),
+              //   ),
+              // ),
+
+              // const Divider(
+              //   color: Colors.black,
+              // ),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 10),
                 height: height * 0.07,
@@ -434,6 +435,29 @@ class _OpeningStockScreenState extends State<OpeningStockScreen> {
 
 //############# upload to firebase cloud Store ######################
 
+  final firestore = FirebaseFirestore.instance;
+  String id='';
+  Future<List<Product>> getItemMasteId() async {
+    final querySnapshot = await firestore.collection('itemMaster').get();
+    final products = querySnapshot.docs.map((e) {
+      final model = Product.fromJson(e.data());
+      model.id = e.id;
+      log(e.id);
+      id = e.id;
+
+      return model;
+    }).toList();
+
+    var collection = FirebaseFirestore.instance.collection('itemMaster');
+    var docSnapshot = await collection.doc(id).get();
+    if (docSnapshot.exists) {
+      Map<String, dynamic>? data = docSnapshot.data();
+      var itemName = data?['item_name'];
+      log(itemName);
+    }
+    return products;
+  }
+
   Future saveOpeningStockData() async {
     setState(() {
       loading = true;
@@ -454,7 +478,12 @@ class _OpeningStockScreenState extends State<OpeningStockScreen> {
 
     await userDoc.set(json);
 
-    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Appcolors.primaryColor,
+        content: Text(
+          "Successfully Saved to the Stock !!",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        )));
     Navigator.pop(context);
     setState(() {
       loading = false;

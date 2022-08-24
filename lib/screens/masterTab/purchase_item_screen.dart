@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_test/utils/app_color.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +17,30 @@ class PurchaseItemScreen extends StatefulWidget {
 class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
   double height = 0;
   double width = 0;
+
+  bool fixedTap = true;
+  bool percentageTap = false;
+
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
-  List unitMasterList = [];
-  String unitMasterValue = "Select Item";
+  List itemMasterList = [];
+  List supplyMasterList = [];
+  String itemMasterValue = "Select Item";
+  String supplyMasterValue = "Select Supplier";
   late FocusNode myFocusNode;
+  _getSupplyMasterData() {
+    var data = FirebaseFirestore.instance.collection('supplyMaster').get();
+
+    data.then((value) {
+      setState(() {
+        supplyMasterList.clear();
+        supplyMasterList.add({
+          "supplier_name": "Select Supplier",
+        });
+        supplyMasterList.addAll(value.docs);
+      });
+    });
+  }
 
   final supplierController = TextEditingController();
   final quantityController = TextEditingController();
@@ -42,16 +63,39 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
   double discountAmount = 0;
 
   getTotalAmount() {
-    quantity = double.parse(quantityController.text);
-    price = double.parse(priceController.text);
-    tax = double.parse(taxController.text);
-    discount = double.parse(discountController.text);
-
-    minmumAmount = quantity * price;
-    taxPrice = minmumAmount * tax / 100;
-    taxablePrice = taxPrice + minmumAmount;
-    discountAmount = taxablePrice * discount / 100;
-    totalAmount = taxablePrice - discountAmount;
+    if (percentageTap == true) {
+      if (quantityController.text.isEmpty &&
+          priceController.text.isEmpty &&
+          discountController.text.isEmpty) {
+        totalAmount = 0.0;
+      } else {
+        quantity = double.parse(quantityController.text);
+        price = double.parse(priceController.text);
+        // tax = double.parse(taxController.text);
+        discount = double.parse(discountController.text);
+        minmumAmount = quantity * price;
+        // taxPrice = minmumAmount * tax / 100;
+        // taxablePrice = taxPrice + minmumAmount;
+        discountAmount = minmumAmount * discount / 100;
+        totalAmount = minmumAmount - discountAmount;
+      }
+    }
+    if (fixedTap == true) {
+      if (quantityController.text.isEmpty &&
+          priceController.text.isEmpty &&
+          discountController.text.isEmpty) {
+        totalAmount = 0.0;
+      } else {
+        quantity = double.parse(quantityController.text);
+        price = double.parse(priceController.text);
+        // tax = double.parse(taxController.text);
+        discount = double.parse(discountController.text);
+        minmumAmount = quantity * price;
+        // taxPrice = minmumAmount * tax / 100;
+        // taxablePrice = taxPrice + minmumAmount;
+        totalAmount = minmumAmount - discount;
+      }
+    }
   }
 
   _getUnimasterData() {
@@ -59,11 +103,13 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
 
     data.then((value) {
       setState(() {
-        unitMasterList.clear();
-        unitMasterList.add({
+        itemMasterList.clear();
+        itemMasterList.add({
           "item_name": "Select Item",
         });
-        unitMasterList.addAll(value.docs);
+        itemMasterList.addAll(value.docs);
+
+        log(itemMasterList.toString());
       });
     });
   }
@@ -71,6 +117,7 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
   @override
   void initState() {
     _getUnimasterData();
+    _getSupplyMasterData();
     super.initState();
   }
 
@@ -109,37 +156,52 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
       key: _formKey,
       child: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            height: height * 0.08,
-            width: width,
-            child: Card(
-              child: TextFormField(
-                controller: supplierController,
-                validator: (text) {
-                  if (text == null || text.isEmpty) {
-                    return 'Supplier Name is required!';
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                    hintText: "  Supplier Name",
-                    hintStyle: TextStyle(fontSize: 14),
-                    border: InputBorder.none),
-              ),
-            ),
-          ),
           SizedBox(
             width: width * 0.96,
+            height: height * 0.06,
             child: Card(
               child: DropdownButton(
-                underline:const SizedBox(),
+                underline: const SizedBox(),
                 // Initial Value
-                value: unitMasterValue,
+                value: supplyMasterValue,
                 // Down Arrow Icon
                 // Array list of items
 
-                items: unitMasterList.map((items) {
+                items: supplyMasterList.map((items) {
+                  return DropdownMenuItem(
+                    value: items['supplier_name'],
+                    child: SizedBox(
+                        height: height * 0.09,
+                        width: width * 0.72,
+                        child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            alignment: Alignment.centerLeft,
+                            child: Text(items['supplier_name']))),
+                  );
+                }).toList(),
+                // After selecting the desired option,it will
+                // change button value to selected value
+                onChanged: (newValue) {
+                  setState(() {
+                    supplyMasterValue = newValue.toString();
+                  });
+                },
+              ),
+            ),
+          ),
+
+          SizedBox(
+            width: width * 0.96,
+            height: height * 0.06,
+            child: Card(
+              child: DropdownButton(
+                underline: const SizedBox(),
+                // Initial Value
+                value: itemMasterValue,
+                // Down Arrow Icon
+                // Array list of items
+
+                items: itemMasterList.map((items) {
                   return DropdownMenuItem(
                     value: items['item_name'],
                     child: SizedBox(
@@ -155,12 +217,13 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
                 // change button value to selected value
                 onChanged: (newValue) {
                   setState(() {
-                    unitMasterValue = newValue.toString();
+                    itemMasterValue = newValue.toString();
                   });
                 },
               ),
             ),
           ),
+
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 10),
             height: height * 0.08,
@@ -223,36 +286,112 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
               ),
             ),
           ),
+          const SizedBox(
+            height: 20,
+          ),
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            height: height * 0.08,
-            width: width,
-            child: Card(
-              child: TextFormField(
-                controller: taxController,
-                onChanged: (value) {
-                  setState(() {
-                    if (value.isEmpty) {
-                      totalAmount = 0;
-                      taxablePrice = 0;
-                    } else {
-                      getTotalAmount();
-                    }
-                  });
-                },
-                keyboardType: TextInputType.number,
-                validator: (text) {
-                  if (text == null || text.isEmpty) {
-                    return 'Tax is required!';
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                    hintText: "  Tax",
-                    hintStyle: TextStyle(fontSize: 14),
-                    border: InputBorder.none),
-              ),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      fixedTap = true;
+                      if (fixedTap == true) {
+                        percentageTap = false;
+                      }
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      const Text(
+                        "Fixed",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      InkWell(
+                        child: Container(
+                          height: 17,
+                          width: 17,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(100),
+                              border: Border.all(color: Colors.black)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                height: 13,
+                                width: 13,
+                                decoration: BoxDecoration(
+                                  color: fixedTap == true
+                                      ? Colors.red
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      percentageTap = true;
+                      if (percentageTap == true) {
+                        fixedTap = false;
+                      }
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      const Text(
+                        "Percentage",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      InkWell(
+                        child: Container(
+                          height: 17,
+                          width: 17,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(100),
+                              border: Border.all(color: Colors.black)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                height: 13,
+                                width: 13,
+                                decoration: BoxDecoration(
+                                  color: percentageTap == true
+                                      ? Colors.red
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
+          ),
+        
+          const SizedBox(
+            height: 10,
           ),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -278,62 +417,18 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
                   }
                   return null;
                 },
-                decoration: const InputDecoration(
-                    hintText: "  Discount",
-                    hintStyle: TextStyle(fontSize: 14),
+                decoration: InputDecoration(
+                    hintText: fixedTap == true
+                        ? "  Fixed Amount Discount"
+                        : percentageTap == true
+                            ? "Enter Percentage % "
+                            : "",
+                    hintStyle: const TextStyle(fontSize: 14),
                     border: InputBorder.none),
               ),
             ),
           ),
-          // Container(
-          //   margin: const EdgeInsets.symmetric(horizontal: 10),
-          //   height: height * 0.08,
-          //   width: width,
-          //   child: Card(
-          //     child: TextFormField(
-          //       controller: pricInTaxController,
-          //       readOnly: true,
-          //       keyboardType: TextInputType.number,
-          //       validator: (text) {
-          //         if (text == null || text.isEmpty) {
-          //           return 'Price Including Tax is required!';
-          //         }
-          //         return null;
-          //       },
-          //       decoration: InputDecoration(
-          //           hintText: taxablePrice == 0
-          //               ? "  Tax Include price"
-          //               : "  ₹ $taxablePrice  Included Tax ",
-          //           hintStyle: const TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
-          //           border: InputBorder.none),
-          //     ),
-          //   ),
-          // ),
-          // Container(
-          //   margin: const EdgeInsets.symmetric(horizontal: 10),
-          //   height: height * 0.08,
-          //   width: width,
-          //   child: Card(
-          //     child: TextFormField(
-          //       controller: totalAmountController,
-          //       readOnly: true,
-          //       keyboardType: TextInputType.number,
-          //       validator: (text) {
-          //         if (text == null || text.isEmpty) {
-          //           return 'Amount is required!';
-          //         }
-          //         return null;
-          //       },
-          //       decoration: InputDecoration(
-          //         hintText: totalAmount == 0
-          //             ? "Total Amount"
-          //             : "  ₹ $totalAmount  Total Amount",
-          //               hintStyle: const TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
-          //           border: InputBorder.none),
-
-          //     ),
-          //   ),
-          // ),
+       
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 10),
             height: height * 0.08,
@@ -387,21 +482,14 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
           const SizedBox(
             height: 10,
           ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              taxablePrice == 0
-                  ? "  Tax Include price"
-                  : quantityController.text.isEmpty &&
-                          priceController.text.isEmpty &&
-                          taxController.text.isEmpty &&
-                          discountController.text.isEmpty
-                      ? "Tax Include Amount"
-                      : "  ₹ $taxablePrice  Included Tax ",
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
+          // Container(
+          //   margin: const EdgeInsets.symmetric(horizontal: 10),
+          //   alignment: Alignment.centerLeft,
+          //   child: Text(
+          //     totalAmount.toString(),
+          //     style: const TextStyle(fontWeight: FontWeight.bold),
+          //   ),
+          // ),
           const SizedBox(
             height: 10,
           ),
@@ -409,14 +497,14 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
             margin: const EdgeInsets.symmetric(horizontal: 10),
             alignment: Alignment.centerLeft,
             child: Text(
-              totalAmount == 0
-                  ? "  Total Amount"
-                  : quantityController.text.isEmpty &&
-                          priceController.text.isEmpty &&
-                          taxController.text.isEmpty &&
-                          discountController.text.isEmpty
-                      ? " Total Amount"
-                      : "  ₹ $totalAmount  Total Amount ",
+              // totalAmount == 0
+              //     ? "  Total Amount"
+              //     : quantityController.text.isEmpty &&
+              //             priceController.text.isEmpty &&
+              //             taxController.text.isEmpty &&
+              //             discountController.text.isEmpty
+              //         ? " Total Amount"
+              "    Total Amount :  ₹ $totalAmount ",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -458,7 +546,25 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
     return InkWell(
       onTap: () {
         if (_formKey.currentState!.validate()) {
-          savePurchaseItemData();
+          if (supplyMasterValue != "Select Supplier") {
+            if (itemMasterValue != "Select Item") {
+              savePurchaseItemData();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  backgroundColor: Appcolors.primaryColor,
+                  content: Text(
+                    "Please Slect Item!!",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )));
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                backgroundColor: Appcolors.primaryColor,
+                content: Text(
+                  "Please Slect Supplier Name!!",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                )));
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               backgroundColor: Appcolors.primaryColor,
@@ -498,12 +604,16 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
 
     final json = {
       "barcode": barCodeController.text.toString(),
-      "discount": discountController.text.toString(),
+      "discount": fixedTap == true
+          ? "₹ ${discountController.text.toString()}"
+          : percentageTap == true
+              ? "${discountController.text.toString()} %"
+              : "",
       "expiry_date": expiryDate.toString(),
-      "itemName": unitMasterValue.toString(),
+      "itemName": itemMasterValue.toString(),
       "price": priceController.text.toString(),
       "quantity": quantityController.text.toString(),
-      "supplierName": supplierController.text.toString(),
+      "supplierName": supplyMasterValue.toString(),
       "tax": taxController.text.toString(),
       "taxable_price": taxablePrice.toString(),
       "total_amount": totalAmount.toString(),
@@ -511,12 +621,12 @@ class _PurchaseItemScreenState extends State<PurchaseItemScreen> {
 
     await userDoc.set(json);
 
- ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              backgroundColor: Appcolors.primaryColor,
-              content: Text(
-                "Successfully Purchased Item !!",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              )));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Appcolors.primaryColor,
+        content: Text(
+          "Successfully Purchased Item !!",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        )));
     Navigator.pop(context);
     setState(() {
       loading = false;
