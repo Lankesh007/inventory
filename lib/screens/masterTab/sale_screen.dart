@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, prefer_interpolation_to_compose_strings
 
 import 'dart:developer';
 
@@ -61,19 +61,47 @@ class _SaleScreenState extends State<SaleScreen> {
     });
   }
 
-  double totalFinal = 0;
-  void calculation() {
+  testagain() {
+    var finalList = [];
+
+    double totalScores = 0;
+    // looping over data array
     for (var element in finalList) {
-      totalFinal = totalFinal + double.parse(element['totalAmont'].toString());
+      //getting the key direectly from the name of the key
+      totalScores =
+          totalScores + double.parse(element['totalAmont'].toString());
     }
-    log("-->$totalFinal");
+
+    log("====>$totalScores"); // OUTPUT ==> 172.39999999999998
   }
 
-  void removef() {
-    for (var element in finalList) {
-      totalFinal = totalFinal - double.parse(element['totalAmont'].toString());
-      log("------->$totalFinal");
-    }
+  // test() {
+  //   var sum = 0;
+  //   var given_list = [
+  //     {"amount": "100"},
+  //     {"amount": "100"},
+  //     {"amount":"100"}
+  //   ];
+
+  //   for (var i = 0; i < given_list.length; i++) {
+  //     sum += int.parse(given_list[i]['amount'].toString()) ;
+  //   }
+
+  //   print("Sum : ${sum}");
+  // }
+
+  double totalFinal = 0.0;
+  void calculation() {
+    double temp = 0;
+
+    finalList.forEach((element) {
+      temp = temp + double.parse(element['totalAmont'].toString());
+    });
+
+    setState(() {
+      totalFinal = temp;
+    });
+   
   }
 
   double quantity = 0;
@@ -126,6 +154,7 @@ class _SaleScreenState extends State<SaleScreen> {
     _getCustomerMasterdata();
     _getItemMasterData();
     finalList.clear();
+
     super.initState();
   }
 
@@ -301,9 +330,9 @@ class _SaleScreenState extends State<SaleScreen> {
                                     ),
                                     IconButton(
                                       onPressed: () {
-                                        removef();
+                                        finalList.removeAt(index);
+                                        calculation();
                                         setState(() {
-                                          finalList.removeAt(index);
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             const SnackBar(
@@ -700,8 +729,8 @@ class _SaleScreenState extends State<SaleScreen> {
                         customerMasterValue != "Select Customer" &&
                         itemMasterValue != "Select Item") {
                       finalList.add({
-                        "qty": quantityController.text,
-                        "price": priceController.text,
+                        "qty": quantityController.text.toString(),
+                        "price": priceController.text.toString(),
                         "discount": fixedTap == true
                             ? "₹ ${discountController.text.toString()}"
                             : percentageTap == true
@@ -711,16 +740,15 @@ class _SaleScreenState extends State<SaleScreen> {
                         "item": itemMasterValue,
                         "totalAmont": totalAmount.toString(),
                       });
-                      calculation();
                       setState(() {
                         quantityController.clear();
                         priceController.clear();
                         discountController.clear();
                         itemMasterValue = "Select Item";
                         customerSupport = true;
-                        listTotalAmount += totalPrice;
-                        log("total price--->$listTotalAmount");
                       });
+
+                      calculation();
 
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text("Successfully Added Item !!"),
@@ -796,16 +824,6 @@ class _SaleScreenState extends State<SaleScreen> {
 
     // final userDoc = FirebaseFirestore.instance.collection('saleMaster').doc();
 
-    // final json = {
-    //   'selected_customer': customerMasterValue.toString(),
-    //   'selected_item': itemMasterValue.toString(),
-    //   'quantity': quantityController.text.toString(),
-    //   'price': priceController.text.toString(),
-    //   'discount': "${discountController.text.toString()} %",
-    //   'total_amount': totalAmount.toString(),
-    // };
-
-    // await userDoc.set(json);
     setState(() {
       Navigator.pop(context);
       loading = false;
